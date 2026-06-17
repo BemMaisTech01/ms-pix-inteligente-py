@@ -1,9 +1,10 @@
-import csv
 import os
 import shutil
 from pathlib import Path
 from typing import Dict, Optional, Union
 
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 from fastapi import FastAPI, File, UploadFile, HTTPException
 
 from ocr.image_ocr import ImageOCR
@@ -19,7 +20,11 @@ class Controlador:
 
     EXTENCOES_VALIDAS = {".pdf", ".png", ".jpg", ".jpeg", ".img"}
     NOME_SALVO = "imgControlador"
-    NOME_PLANILHA = "dados_extraidos.csv"
+    CREDENCIAL_SHEETS = "pix-inteligente-499220-acd0a7fbcf30.json"
+    ID_DA_PLANILHA = "17BijYpzhNVnPurEkcCvs4yrcsHe4hc2XMRM8bX4_-II"
+    ABA_INDICE = 0
+    CAMPOS = ["banco", "hora", "recebedor", "valor"]
+    CREDENCIAL_PATH_ENV = "SHEETS_CREDENTIALS_PATH"
 
     def __init__(self, arquivo: Union[str, Path, UploadFile]):
         self.upload_file: Optional[UploadFile] = None
@@ -97,16 +102,37 @@ class Controlador:
         return Path(__file__).resolve().parents[1]
 
     def _salvar_planilha(self, dados: Dict[str, Optional[str]]) -> None:
-        """Grava os dados extraídos em um CSV no diretório do projeto."""
-        arquivo = self._diretorio_projeto() / self.NOME_PLANILHA
-        campos = ["banco", "hora", "recebedor", "valor"]
-        existe = arquivo.exists()
+        """Grava os dados extraídos em uma planilha do Google Sheets."""
+        planilha = self._conectar_sheets()
+        linha = [dados.get(campo, "") or "" for campo in self.CAMPOS]
+        planilha.append_row(linha, value_input_option="USER_ENTERED")
 
-        with arquivo.open("a", newline="", encoding="utf-8") as csvfile:
-            escritor = csv.DictWriter(csvfile, fieldnames=campos)
-            if not existe:
-                escritor.writeheader()
-            escritor.writerow({campo: dados.get(campo, "") for campo in campos})
+    def _conectar_sheets(self) -> "gspread.models.Worksheet":
+        credencial_path = os.environ.get(self.CREDENCIAL_PATH_ENV)
+        if credencial_path:
+            credencial_path = Path(credencial_path)
+        else:
+            credencial_path = self._diretorio_projeto() / self.CREDENCIAL_SHEETS
+
+        if not credencial_path.exists():
+            raise HTTPException(
+                status_code=500,
+                detail=(
+                    f"Arquivo de credenciais não encontrado: {credencial_path}. "
+                    f"Defina a variável de ambiente {self.CREDENCIAL_PATH_ENV} ou coloque o arquivo no diretório do projeto."
+                ),
+            )
+
+        scopes = [
+            "https://spreadsheets.google.com/feeds",
+            "https://www.googleapis.com/auth/drive",
+        ]
+        creds = ServiceAccountCredentials.from_json_keyfile_name(
+            filename=str(credencial_path), scopes=scopes
+        )
+        client = gspread.authorize(creds)
+        planilha = client.open_by_key(self.ID_DA_PLANILHA)
+        return planilha.get_worksheet(self.ABA_INDICE)
 
     def _validar_extensao(self) -> None:
         if self.suffix not in self.EXTENCOES_VALIDAS:
