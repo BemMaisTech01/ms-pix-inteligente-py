@@ -1,5 +1,7 @@
 import os
 import shutil
+import json
+import tempfile
 from pathlib import Path
 from typing import Dict, Optional, Union
 
@@ -109,6 +111,22 @@ class Controlador:
 
     def _conectar_sheets(self) -> "gspread.models.Worksheet":
         credencial_path = os.environ.get(self.CREDENCIAL_PATH_ENV)
+        
+        # Se não houver caminho direto, tenta usar JSON como string (para Render)
+        if not credencial_path:
+            google_creds_json = os.environ.get("GOOGLE_CREDENTIALS_JSON")
+            if google_creds_json:
+                # Cria arquivo temporário com o JSON da variável de ambiente
+                try:
+                    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+                        f.write(google_creds_json)
+                        credencial_path = f.name
+                except Exception as e:
+                    raise HTTPException(
+                        status_code=500,
+                        detail=f"Erro ao processar GOOGLE_CREDENTIALS_JSON: {str(e)}"
+                    )
+        
         if credencial_path:
             credencial_path = Path(credencial_path)
         else:
@@ -119,7 +137,8 @@ class Controlador:
                 status_code=500,
                 detail=(
                     f"Arquivo de credenciais não encontrado: {credencial_path}. "
-                    f"Defina a variável de ambiente {self.CREDENCIAL_PATH_ENV} ou coloque o arquivo no diretório do projeto."
+                    f"Defina a variável de ambiente {self.CREDENCIAL_PATH_ENV} ou GOOGLE_CREDENTIALS_JSON, "
+                    f"ou coloque o arquivo no diretório do projeto."
                 ),
             )
 

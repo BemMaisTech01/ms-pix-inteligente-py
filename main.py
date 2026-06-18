@@ -1,3 +1,7 @@
+# Carrega variáveis de ambiente do arquivo .env
+from dotenv import load_dotenv
+load_dotenv()
+
 from ocr.tratamento_imagem import TratamentoImagem
 from ocr.image_ocr import ImageOCR
 from ocr.texto_tratamento import TextoTratamento
