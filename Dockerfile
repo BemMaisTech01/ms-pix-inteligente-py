@@ -2,14 +2,8 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies required by OpenCV and Poppler
+# Minimal system dependencies: only poppler for PDF handling
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libglib2.0-0 \
-    libsm6 \
-    libxrender1 \
-    libxext6 \
-    libx11-6 \
-    libxcb1 \
     poppler-utils \
  && rm -rf /var/lib/apt/lists/*
 
