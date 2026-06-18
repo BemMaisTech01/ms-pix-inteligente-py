@@ -13,7 +13,15 @@ from Controller.controlador import Controlador
 
 
 def main() -> None:
-    caminho_imagem = Controlador("ComprovanteSantander.pdf").salvar_para_projeto()
+    # By default we skip local processing so the application can run as an API server.
+    # To run local processing for testing, set the environment variable `LOCAL_IMAGE_PATH`
+    # to a path (or filename) and the script will process that image.
+    local_image = os.environ.get("LOCAL_IMAGE_PATH")
+    if not local_image:
+        print("LOCAL_IMAGE_PATH not set — skipping local processing. Use the API to upload files.")
+        return
+
+    caminho_imagem = Controlador(local_image).salvar_para_projeto()
 
     # detectar se poppler está disponível no PATH
     poppler_path = None
