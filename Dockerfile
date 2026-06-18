@@ -32,4 +32,5 @@ COPY . /app
 
 ENV PYTHONUNBUFFERED=1
 
-CMD ["python", "main.py"]
+# Start the FastAPI app with Uvicorn
+CMD ["uvicorn", "Controller.controlador:app", "--host", "0.0.0.0", "--port", "8000"]
