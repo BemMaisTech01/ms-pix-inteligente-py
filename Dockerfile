@@ -5,6 +5,7 @@ WORKDIR /app
 # Minimal system dependencies: only poppler for PDF handling
 RUN apt-get update && apt-get install -y --no-install-recommends \
     poppler-utils \
+    tesseract-ocr \
  && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and convert to UTF-8 if needed
