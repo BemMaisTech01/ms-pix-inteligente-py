@@ -3,9 +3,15 @@ import numpy as np
 import pytesseract
 import os
 
-# Ajuste do caminho do tesseract, mantenha se necessário
-pytesseract.pytesseract.tesseract_cmd = r"C:\Users\dener\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"
-os.environ["TESSDATA_PREFIX"] = r"C:\Users\dener\AppData\Local\Programs\Tesseract-OCR\tessdata"
+# Use environment variables for Tesseract path when needed.
+# In Docker/Render, the executable should be on PATH after `apt-get install -y tesseract-ocr`.
+# If you need a custom Tesseract installation path, set TESSERACT_CMD and optionally TESSDATA_PREFIX.
+tesseract_cmd = os.environ.get("TESSERACT_CMD")
+if tesseract_cmd:
+    pytesseract.pytesseract.tesseract_cmd = tesseract_cmd
+
+if "TESSDATA_PREFIX" in os.environ:
+    os.environ["TESSDATA_PREFIX"] = os.environ["TESSDATA_PREFIX"]
 
 
 class ImageOCR:
