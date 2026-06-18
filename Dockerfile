@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrender1 \
     libxext6 \
     libx11-6 \
+    libgl1 \
     libxcb1 \
     libxcb-xinerama0 \
     poppler-utils \
