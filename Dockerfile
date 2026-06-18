@@ -4,15 +4,12 @@ WORKDIR /app
 
 # Install system dependencies required by OpenCV and Poppler
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgl1 \
-    libgl1-mesa-glx \
     libglib2.0-0 \
     libsm6 \
     libxrender1 \
     libxext6 \
     libx11-6 \
     libxcb1 \
-    libxcb-xinerama0 \
     poppler-utils \
  && rm -rf /var/lib/apt/lists/*
 
