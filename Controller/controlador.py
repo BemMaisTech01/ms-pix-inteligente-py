@@ -141,11 +141,14 @@ class Controlador:
                     f"ou coloque o arquivo no diretório do projeto."
                 ),
             )
-
         scopes = [
-            "https://spreadsheets.google.com/feeds",
-            "https://www.googleapis.com/auth/drive",
-        ]
+            # Escopo específico para ver, editar, criar e excluir suas planilhas no Google Drive
+            "https://www.googleapis.com/auth/spreadsheets",
+    
+            # Opcional: use apenas se o seu script precisar manipular a estrutura do Drive
+            # (como criar pastas, mover arquivos ou alterar permissões de compartilhamento)
+            "https://www.googleapis.com/auth/drive"
+]
         creds = ServiceAccountCredentials.from_json_keyfile_name(
             filename=str(credencial_path), scopes=scopes
         )
