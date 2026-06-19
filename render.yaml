@@ -9,6 +9,9 @@ services:
       - key: SHEETS_CREDENTIALS_PATH
         scope: run
         sync: false
+      - key: TESSERACT_CMD
+        scope: run
+        sync: false
 
     # Comando customizado (opcional - Docker já tem CMD definido)
     # dockerCommand: uvicorn Controller.controlador:app --host 0.0.0.0 --port 10000
