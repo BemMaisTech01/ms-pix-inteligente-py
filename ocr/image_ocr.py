@@ -6,7 +6,8 @@ import os
 # Use environment variables for Tesseract path when needed.
 # In Docker/Render, the executable should be on PATH after `apt-get install -y tesseract-ocr`.
 # If you need a custom Tesseract installation path, set TESSERACT_CMD and optionally TESSDATA_PREFIX.
-tesseract_cmd = os.environ.get("TESSERACT_CMD")
+
+tesseract_cmd = os.environ.get("TESSERACT_CMD", r"C:\Program Files\Tesseract-OCR\tesseract.exe")
 if tesseract_cmd:
     pytesseract.pytesseract.tesseract_cmd = tesseract_cmd
 
