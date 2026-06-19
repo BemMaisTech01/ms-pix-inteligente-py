@@ -2,9 +2,6 @@ import cv2
 import numpy as np
 import pytesseract
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Use environment variables for Tesseract path when needed.
 # In Docker/Render, the executable should be on PATH after `apt-get install -y tesseract-ocr`.
